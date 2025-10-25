@@ -3,6 +3,7 @@
         "bit": "cpp",
         "cmath": "cpp",
         "numbers": "cpp",
-        "system_error": "cpp"
+        "system_error": "cpp",
+        "functional": "cpp"
     }
 }

@@ -31,6 +31,16 @@
 #define STACK_LIMIT 512
 
 /**
+ * Binary operation.
+ */
+#define BINARY_OP(op)                \
+    do {                             \
+        auto op2 = AS_NUMBER(pop()); \
+        auto op1 = AS_NUMBER(pop()); \
+        push(NUMBER(op1 op op2));    \
+    } while (false)
+
+/**
  * Chris Virtual Machine
  */
 class ChrisVM {
@@ -69,19 +79,28 @@ class ChrisVM {
             // 2. Compile program to Chris bytecode
             // code = compiler->compile(ast);
 
-            // Init the stack:
-            sp = &stack[0];
+            constants.push_back(NUMBER(10));
+            constants.push_back(NUMBER(3));
+            constants.push_back(NUMBER(10));
 
-            constants.push_back(NUMBER(42));
-
+            // (- (* 10 3) 10)
             code = {
                 OP_CONST,
                 0,
+                OP_CONST,
+                1,
+                OP_MUL,
+                OP_CONST,
+                2,
+                OP_SUB,
                 OP_HALT
             };
 
             // Set instruction pointer to the beginning:
             ip = &code[0];
+
+            // Init the stack:
+            sp = &stack[0];
 
             return eval();
         }
@@ -103,6 +122,31 @@ class ChrisVM {
                         push(GET_CONST());
                         break;
 
+                    // ---------------------
+                    // Math ops:
+                    case OP_ADD:
+                    {
+                        BINARY_OP(+);
+                        break;
+                    }
+
+                    case OP_SUB:
+                    {
+                        BINARY_OP(-);
+                        break;
+                    }
+
+                    case OP_MUL:
+                    {
+                        BINARY_OP(*);
+                        break;
+                    }
+
+                    case OP_DIV:
+                    {
+                        BINARY_OP(/);
+                        break;
+                    }
                     
                     default:
                         DIE << "Unknown opcode: " << std::hex << opcode;
