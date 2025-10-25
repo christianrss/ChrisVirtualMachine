@@ -1,0 +1,8 @@
+{
+    "files.associations": {
+        "bit": "cpp",
+        "cmath": "cpp",
+        "numbers": "cpp",
+        "system_error": "cpp"
+    }
+}
