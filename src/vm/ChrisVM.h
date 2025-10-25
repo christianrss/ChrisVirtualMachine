@@ -2,12 +2,13 @@
  * Chris Virtual Machine
  */
 
-#ifndef __ChrisVM_h
-#define __ChrisVM_h
+#ifndef ChrisVM_h
+#define ChrisVM_h
 
 #include <string>
 #include <vector>
 
+#include "../Logger.h"
 #include "../bytecode/OpCode.h"
 #include <cstdint>
 
@@ -46,9 +47,13 @@ class ChrisVM {
          */
         void eval() {
             for (;;) {
-                switch (READ_BYTE()) {
+                auto opcode = READ_BYTE();
+                log(opcode);
+                switch (opcode) {
                     case OP_HALT:
                         return;
+                    default:
+                        DIE << "Unknown opcode: " << std::hex << opcode;
                 }
             }
         }
