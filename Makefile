@@ -1,9 +1,9 @@
 CXX = clang++
-CXXFLAGS = -std=c++17 -Wall -ggdb3
+CXXFLAGS = -std=c++17 -stdlib=libc++ -Wall -O0 -ggdb3
 
 chris-vm: chris-vm.o
 	mkdir -p bin/
-	$(CXX) bin/chris-vm.o -o bin/chris-vm
+	$(CXX) $(CXXFLAGS) bin/chris-vm.o -o bin/chris-vm
 
 chris-vm.o: chris-vm.cpp
 	$(CXX) $(CXXFLAGS) -c ./chris-vm.cpp -o ./bin/chris-vm.o

@@ -8,11 +8,13 @@
 #include <array>
 #include <string>
 #include <vector>
-#include <cstdint>
 
 #include "../Logger.h"
 #include "../bytecode/OpCode.h"
+#include "../parser/ChrisParser.h"
 #include "ChrisValue.h"
+
+using syntax::ChrisParser;
 
 /**
  * Reads the current byte in the bytecode
@@ -45,7 +47,7 @@
  */
 class ChrisVM {
     public:
-        ChrisVM() {}
+        ChrisVM() : parser(std::make_unique<ChrisParser>()) {}
 
         /**
          * Pushes a value onto the stack.
@@ -72,9 +74,9 @@ class ChrisVM {
         /**
         * Executes a program.
         */
-        ChrisValue exec(const std::string &program) {
+        ChrisValue exec(const std::string& program) {
             // 1. Parse the program
-            // auto ast = parser->parse(program)
+            auto ast = parser->parse(program);
 
             // 2. Compile program to Chris bytecode
             // code = compiler->compile(ast);
@@ -165,6 +167,11 @@ class ChrisVM {
                 }
             }
         }
+
+        /**
+         * Parser.
+         */
+        std::unique_ptr<ChrisParser> parser;
 
         /**
          * Instruction pointer (aka Program counter).
