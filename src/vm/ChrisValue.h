@@ -106,4 +106,46 @@ struct CodeObject: public Object {
 #define IS_STRING(chrisValue) IS_OBJECT_TYPE(chrisValue, ObjectType::STRING)
 #define IS_CODE(chrisValue) IS_OBJECT_TYPE(chrisValue, ObjectType::CODE)
 
+/**
+ * String representation used in constants for debug.
+ */
+std::string chrisValueToTypeString(const ChrisValue &chrisValue) {
+    if (IS_NUMBER(chrisValue)) {
+        return "NUMBER";
+    } else if (IS_STRING(chrisValue)) {
+        return "STRING";
+    } else if (IS_CODE(chrisValue)) {
+        return "CODE";
+    } else {
+        DIE << "chrisValueToTypeString: unknown type " << (int)chrisValue.type;
+    }
+    return ""; // Unreachable
+}
+
+/**
+ * String representation used in constants for debug.
+ */
+std::string chrisValueToConstantString(const ChrisValue &chrisValue) {
+    std::stringstream ss;
+    if (IS_NUMBER(chrisValue)) {
+        ss << chrisValue.number;
+    } else if (IS_STRING(chrisValue)) {
+        ss << '"' << AS_CPPSTRING(chrisValue) << '"';
+    } else if (IS_CODE(chrisValue)) {
+        auto code = AS_CODE(chrisValue);
+        ss << "code " << code << ": " << code->name;
+    } else {
+        DIE << "chrisValueToConstantString: unkown type " << (int)chrisValue.type;
+    }
+    return ss.str();
+}
+
+/**
+ * Output stream.
+ */
+std::ostream &operator<<(std::ostream &os, const ChrisValue &chrisValue) {
+    return os << "ChrisValue (" << chrisValueToTypeString(chrisValue)
+        << "): " <<chrisValueToConstantString(chrisValue);
+}
+
 #endif

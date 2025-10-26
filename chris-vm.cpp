@@ -11,11 +11,11 @@ int main(int argc, char const *argv[]) {
 
     auto result = vm.exec(R"(
 
-        "Hello"
+        (+ "hello" " world")
 
     )");
 
-    log(AS_CPPSTRING(result));
+    log(result);
 
     std::cout << "All done!\n";
 
