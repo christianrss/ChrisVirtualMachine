@@ -11,7 +11,7 @@ int main(int argc, char const *argv[]) {
 
     auto result = vm.exec(R"(
 
-        (+ "Hello, " "world!")
+        "Hello"
 
     )");
 

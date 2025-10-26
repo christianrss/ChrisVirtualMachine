@@ -12,6 +12,7 @@
 #include "../Logger.h"
 #include "../bytecode/OpCode.h"
 #include "../parser/ChrisParser.h"
+#include "../compiler/ChrisCompiler.h"
 #include "ChrisValue.h"
 
 using syntax::ChrisParser;
@@ -25,7 +26,7 @@ using syntax::ChrisParser;
 /**
  * Gets a constant from the pool.
  */
-#define GET_CONST() constants[READ_BYTE()]
+#define GET_CONST() co->constants[READ_BYTE()]
 
 /**
  * Stack top (stack overflow after exceeding).
@@ -47,7 +48,8 @@ using syntax::ChrisParser;
  */
 class ChrisVM {
     public:
-        ChrisVM() : parser(std::make_unique<ChrisParser>()) {}
+        ChrisVM() : parser(std::make_unique<ChrisParser>()),
+                    compiler(std::make_unique<ChrisCompiler>()) {}
 
         /**
          * Pushes a value onto the stack.
@@ -79,24 +81,10 @@ class ChrisVM {
             auto ast = parser->parse(program);
 
             // 2. Compile program to Chris bytecode
-            // code = compiler->compile(ast);
-
-            constants.push_back(ALLOC_STRING("Hello,"));
-            constants.push_back(ALLOC_STRING("world!"));
-
-
-            // (+ "Hello, " "world!") -> "Hello, world!"
-            code = {
-                OP_CONST,
-                0,
-                OP_CONST,
-                1,
-                OP_ADD,
-                OP_HALT
-            };
+            co = compiler->compile(ast);
 
             // Set instruction pointer to the beginning:
-            ip = &code[0];
+            ip = &co->code[0];
 
             // Init the stack:
             sp = &stack[0];
@@ -174,6 +162,11 @@ class ChrisVM {
         std::unique_ptr<ChrisParser> parser;
 
         /**
+         * Compiler.
+         */
+        std::unique_ptr<ChrisCompiler> compiler;
+
+        /**
          * Instruction pointer (aka Program counter).
          */
         uint8_t* ip;
@@ -189,14 +182,9 @@ class ChrisVM {
         std::array<ChrisValue, STACK_LIMIT> stack;
 
         /**
-         * Constant pool.
+         * Code object.
          */
-        std::vector<ChrisValue> constants;
-
-        /**
-         * Bytecode.
-         */
-        std::vector<uint8_t> code;
+        CodeObject* co;
 };
 
 #endif

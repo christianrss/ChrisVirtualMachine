@@ -20,6 +20,7 @@ enum class ChrisValueType {
  */
 enum class ObjectType {
     STRING,
+    CODE,
 };
 
 /**
@@ -50,12 +51,39 @@ struct ChrisValue {
     };
 };
 
+
+
+/**
+ * Code object.
+ */
+struct CodeObject: public Object {
+    CodeObject(const std::string& name) : Object(ObjectType::CODE), name(name) {}
+
+    /**
+     * Name of the unit (usually function name).
+     */
+    std::string name;
+
+    /**
+     * Constant pool.
+     */
+    std::vector<ChrisValue> constants;
+
+    /**
+     * Bytecode.
+     */
+    std::vector<uint8_t> code;
+};
+
 // ------------------------------------------------------------------------
 // Constructors:
 #define NUMBER(value) ((ChrisValue) { .type = ChrisValueType::NUMBER, .number = value})
 
 #define ALLOC_STRING(value) \
     ((ChrisValue) { .type = ChrisValueType::OBJECT, .object = (Object*)new StringObject(value)})
+
+#define ALLOC_CODE(name) \
+    ((ChrisValue) { .type = ChrisValueType::OBJECT, .object = (Object*) new CodeObject(name)})
 
 // ------------------------------------------------------------------------
 // Accessors:
@@ -64,6 +92,8 @@ struct ChrisValue {
 
 #define AS_STRING(chrisValue) ((StringObject*)(chrisValue).object)
 #define AS_CPPSTRING(chrisValue) (AS_STRING(chrisValue)->string)
+
+#define AS_CODE(chrisValue) ((CodeObject*)(chrisValue).object)
 
 // ------------------------------------------------------------------------
 // Testers:
@@ -74,5 +104,6 @@ struct ChrisValue {
     (IS_OBJECT(chrisValue) && AS_OBJECT(chrisValue)->type == objectType)
 
 #define IS_STRING(chrisValue) IS_OBJECT_TYPE(chrisValue, ObjectType::STRING)
+#define IS_CODE(chrisValue) IS_OBJECT_TYPE(chrisValue, ObjectType::CODE)
 
 #endif
