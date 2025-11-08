@@ -3,10 +3,10 @@ CXXFLAGS = -std=c++17 -stdlib=libc++ -Wall -O0 -ggdb3
 
 .PHONY: all clean
 
+all: clean chris-vm
+
 bin:
 	mkdir -p bin
-
-all: clean chris-vm
 
 chris-vm: chris-vm.o | bin
 	mkdir -p bin/

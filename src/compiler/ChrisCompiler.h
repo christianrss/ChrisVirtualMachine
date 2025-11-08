@@ -5,6 +5,9 @@
 #ifndef ChrisCompiler_h
 #define ChrisCompiler_h
 
+#include <map>
+#include <string>
+
 #include "../parser/ChrisParser.h"
 #include "../vm/ChrisValue.h"
 
@@ -81,7 +84,15 @@ public:
              * Symbols (variables, operators).
              */
             case ExpType::SYMBOL:
-                DIE << "ExpType::SYMBOL:: unimplemented.";
+                /**
+                 * Boolean.
+                 */
+                if (exp.string == "true" || exp.string == "false") {
+                    emit(OP_CONST);
+                    emit(booleanConstIdx(exp.string == "true" ? true : false));
+                } else {
+                    // Variables: TODO
+                }
                 break;
 
             /**
@@ -115,6 +126,15 @@ public:
                     else if (op == "/") {
                         GEN_BINARY_OP(OP_DIV);
                     }
+
+                    // -----------------------------------------------
+                    // Compare operations: (> 5 10)
+                    else if (compareOps_.count(op) != 0) {
+                        gen(exp.list[1]);
+                        gen(exp.list[2]);
+                        emit(OP_COMPARE);
+                        emit(compareOps_[op]);
+                    }
                 }
                 break;
         }
@@ -137,6 +157,14 @@ private:
     }
 
     /**
+     * Allocates a boolean constant.
+     */
+    size_t booleanConstIdx(const bool value) {
+        ALLOC_CONST(IS_BOOLEAN, AS_BOOLEAN, BOOLEAN, value);
+        return co->constants.size() - 1;
+    }
+
+    /**
      * Emits data to the bytecode.
      */
     void emit(uint8_t code) { co->code.push_back(code); }
@@ -145,6 +173,18 @@ private:
      * Compiling code object.
      */
     CodeObject* co;
+
+    /**
+     * Compares ops map.
+     */
+    static std::map<std::string, uint8_t> compareOps_;
+};
+
+/**
+ * Compare ops map.
+ */
+std::map<std::string, uint8_t> ChrisCompiler::compareOps_ = {
+    {"<", 0}, {">", 1}, {"==", 2}, {">=", 3}, {"<=", 4}, {"!=", 5},
 };
 
 #endif

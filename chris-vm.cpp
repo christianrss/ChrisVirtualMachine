@@ -10,9 +10,7 @@ int main(int argc, char const *argv[]) {
     ChrisVM vm;
 
     auto result = vm.exec(R"(
-
-        (+ "hello" " world")
-
+        (> 5 10)
     )");
 
     log(result);

@@ -12,6 +12,7 @@
  */
 enum class ChrisValueType {
     NUMBER,
+    BOOLEAN,
     OBJECT,
 };
 
@@ -47,11 +48,10 @@ struct ChrisValue {
     ChrisValueType type;
     union {
         double number;
+        bool boolean;
         Object* object;
     };
 };
-
-
 
 /**
  * Code object.
@@ -78,6 +78,7 @@ struct CodeObject: public Object {
 // ------------------------------------------------------------------------
 // Constructors:
 #define NUMBER(value) ((ChrisValue) { .type = ChrisValueType::NUMBER, .number = value})
+#define BOOLEAN(value) ((ChrisValue) { .type = ChrisValueType::BOOLEAN, .boolean = value})
 
 #define ALLOC_STRING(value) \
     ((ChrisValue) { .type = ChrisValueType::OBJECT, .object = (Object*)new StringObject(value)})
@@ -88,6 +89,7 @@ struct CodeObject: public Object {
 // ------------------------------------------------------------------------
 // Accessors:
 #define AS_NUMBER(chrisValue) ((double)(chrisValue).number)
+#define AS_BOOLEAN(chrisValue) ((bool)(chrisValue).boolean)
 #define AS_OBJECT(chrisValue) ((Object*)(chrisValue).object)
 
 #define AS_STRING(chrisValue) ((StringObject*)(chrisValue).object)
@@ -98,6 +100,7 @@ struct CodeObject: public Object {
 // ------------------------------------------------------------------------
 // Testers:
 #define IS_NUMBER(chrisValue) ((chrisValue).type == ChrisValueType::NUMBER)
+#define IS_BOOLEAN(chrisValue) ((chrisValue).type == ChrisValueType::BOOLEAN)
 #define IS_OBJECT(chrisValue) ((chrisValue).type == ChrisValueType::OBJECT)
 
 #define IS_OBJECT_TYPE(chrisValue, objectType) \
@@ -112,6 +115,8 @@ struct CodeObject: public Object {
 std::string chrisValueToTypeString(const ChrisValue &chrisValue) {
     if (IS_NUMBER(chrisValue)) {
         return "NUMBER";
+    } else if (IS_BOOLEAN(chrisValue)) {
+        return "BOOLEAN";
     } else if (IS_STRING(chrisValue)) {
         return "STRING";
     } else if (IS_CODE(chrisValue)) {
@@ -129,6 +134,8 @@ std::string chrisValueToConstantString(const ChrisValue &chrisValue) {
     std::stringstream ss;
     if (IS_NUMBER(chrisValue)) {
         ss << chrisValue.number;
+    } else if (IS_BOOLEAN(chrisValue)) {
+        ss << (chrisValue.boolean == true ? "true" : "false");
     } else if (IS_STRING(chrisValue)) {
         ss << '"' << AS_CPPSTRING(chrisValue) << '"';
     } else if (IS_CODE(chrisValue)) {
