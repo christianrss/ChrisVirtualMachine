@@ -9,6 +9,7 @@
 #include <string>
 
 #include "../parser/ChrisParser.h"
+#include "../disassembler/ChrisDisassembler.h"
 #include "../vm/ChrisValue.h"
 
 // Allocates new constant in the pool.
@@ -38,7 +39,7 @@
  */
 class ChrisCompiler {
 public:
-        ChrisCompiler() {}
+        ChrisCompiler() : disassembler(std::make_unique<ChrisDisassembler>()) {}
 
     /**
      * Main compile API.
@@ -182,7 +183,17 @@ public:
                 break;
         }
     }
+
+    /**
+     * Disassemble all complication units.
+     */
+    void disassemblyBytecode() { disassembler->disassemble(co); }
 private:
+    /**
+     * Disassembler.
+     */
+    std::unique_ptr<ChrisDisassembler> disassembler;
+
     /**
      * Returns current bytecode offset.
      */

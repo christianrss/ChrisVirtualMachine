@@ -128,6 +128,9 @@ class ChrisVM {
             // Init the stack:
             sp = &stack[0];
 
+            // Debug disassembly:
+            compiler->disassemblyBytecode();
+
             return eval();
         }
 
